@@ -22,6 +22,7 @@ requirements:
   host:
     - python
     - setuptools-scm
+    - setuptools >=30.3.0
     - pip
     - wheel
     - numpy
