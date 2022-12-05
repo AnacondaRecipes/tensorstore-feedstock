@@ -1,0 +1,59 @@
+{% set name = "tensorstore" %}
+{% set version = "0.1.28" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: cd8d8185136632c58edcd7cf4c43d301bf8ad61a197c632cb495d7d33b7be04e
+
+build:
+  # ppc64le and s390x are not supported by bazel. 
+  # aarch64 is not supported in `bazelbuild/rules_perl`: https://github.com/google/tensorstore/issues/35#issuecomment-1188371433
+  # win should be possible in the future
+  skip: true  # [ppc64le or s390x or aarch64 or win or py<37]
+  script: {{ PYTHON }} -m pip install . --no-deps -vv
+  number: 0
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+  host:
+    - python
+    - setuptools-scm
+    - setuptools >=30.3.0
+    - pip
+    - wheel
+    - numpy
+  run:
+    - python
+    - numpy >=1.16.0
+
+test:
+  imports:
+    - tensorstore
+  commands:
+    - pip check
+  requires:
+    - pip
+
+about:
+  home: https://google.github.io/tensorstore/
+  dev_url: https://github.com/google/tensorstore
+  doc_url: https://google.github.io/tensorstore/
+  summary: Read and write large, multi-dimensional arrays
+  description: |
+    TensorStore is a library for efficiently reading and writing large multi-dimensional arrays.
+  license: Apache-2.0
+  license_file: LICENSE
+  license_family: Apache
+
+extra:
+  recipe-maintainers:
+    - ELundby45
+  skip-lints:
+    - missing_license_url
+    - missing_doc_source_url
