@@ -8,12 +8,13 @@ package:
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: cd8d8185136632c58edcd7cf4c43d301bf8ad61a197c632cb495d7d33b7be04e
+  patches:
+    - patches/00-add-aarch64-support.patch
 
 build:
-  # ppc64le and s390x are not supported by bazel. 
-  # aarch64 is not supported in `bazelbuild/rules_perl`: https://github.com/google/tensorstore/issues/35#issuecomment-1188371433
+  # ppc64le and s390x are not supported by bazel.
   # win should be possible in the future
-  skip: true  # [ppc64le or s390x or aarch64 or win or py<37]
+  skip: true  # [ppc64le or s390x or win or py<37]
   script: {{ PYTHON }} -m pip install . --no-deps -vv
   number: 0
 
@@ -21,6 +22,8 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - patch     # [unix]
+    - m2-patch  # [win]
   host:
     - python
     - setuptools-scm
