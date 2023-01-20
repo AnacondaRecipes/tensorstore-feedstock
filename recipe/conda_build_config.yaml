@@ -4,3 +4,8 @@ macos_min_version:         # [osx and x86]
   - 10.14                  # [osx and x86]
 MACOSX_DEPLOYMENT_TARGET:  # [osx and x86]
   - 10.14                  # [osx and x86]
+
+cxx_compiler:        # [win]
+  - vs2019           # [win]
+c_compiler:          # [win]
+  - vs2019           # [win]
