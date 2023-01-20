@@ -16,8 +16,7 @@ source:
 
 build:
   # ppc64le and s390x are not supported by bazel.
-  # win should be possible in the future
-  skip: true  # [ppc64le or s390x or win or py<37]
+  skip: true  # [ppc64le or s390x or py<37]
   script: {{ PYTHON }} -m pip install . --no-deps -vv
   number: 0
 
