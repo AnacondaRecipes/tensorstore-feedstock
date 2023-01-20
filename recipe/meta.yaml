@@ -10,6 +10,9 @@ source:
   sha256: cd8d8185136632c58edcd7cf4c43d301bf8ad61a197c632cb495d7d33b7be04e
   patches:
     - patches/00-add-aarch64-support.patch
+    # Updates `build_perl` to newer commit with support for aarch64. 
+    #   See: https://github.com/google/tensorstore/issues/35#issuecomment-1188371433
+    - patches/01-update-build-perl.patch
 
 build:
   # ppc64le and s390x are not supported by bazel.
