@@ -2,7 +2,7 @@
 {% set version = "0.1.76" %}
 # Bazel version is specified upstream, file .bazelversion
 # https://github.com/google/tensorstore/blob/master/.bazelversion
-{% set bazel_version = "6.3.2" %}
+{% set bazel_version = "7.6.1" %}
 
 package:
   name: {{ name|lower }}
@@ -10,15 +10,15 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/tensorstore-{{ version }}.tar.gz
-  sha256: 65cbe5a600c32569bb0b9f597ea318cc298a13b42d5fc98168c97bb11f320eae
+  sha256: ed0d565e7a038a84b1b5b5d9f7397caec200b53941d8889f44b7f63dd6abffe7
   patches:
-    # MacOS needs an extra linker flag so pybind11 finds the python symbols in _tensorstore.so :shrug:
-    - patches/pybind11-linkopts.patch  # [osx]
-    - patches/0001-Explicitly-select-blake3-for-arm64.patch  # [target_platform == "osx-arm64" or target_platform == "linux-aarch64"]
-    - patches/0002-Explicitly-select-blake3-for-ppc64.patch  # [target_platform == "linux-ppc64le"]
+#    # MacOS needs an extra linker flag so pybind11 finds the python symbols in _tensorstore.so :shrug:
+#    - patches/pybind11-linkopts.patch  # [osx]
+#    - patches/0001-Explicitly-select-blake3-for-arm64.patch  # [target_platform == "osx-arm64" or target_platform == "linux-aarch64"]
+#    - patches/0002-Explicitly-select-blake3-for-ppc64.patch  # [target_platform == "linux-ppc64le"]
 
 build:
-  skip: true  # [win]
+  skip: true  # [py<310 or win]
   number: 0
 
 requirements:
@@ -26,10 +26,10 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
-    # Keep bazel listed twice here to help the migrators track dependencies
-    - bazel
-    - bazel {{ bazel_version }}
-    - bazel-toolchain
+#    # Keep bazel listed twice here to help the migrators track dependencies
+#    - bazel
+#    - bazel {{ bazel_version }}
+#    - bazel-toolchain
     - python                              # [target_platform != build_platform]
     - cross-python_{{ target_platform }}  # [target_platform != build_platform]
     - numpy                               # [target_platform != build_platform]
@@ -40,9 +40,9 @@ requirements:
     - pip
     - python
     - wheel
-    - setuptools
-    - setuptools-scm
-    - numpy
+    - setuptools >=64
+    - setuptools-scm >=8.1.0
+    - numpy >=2.0.0
     # we use openssl instead of boringssl
     - openssl
     - bzip2
@@ -64,8 +64,37 @@ requirements:
     # needs to be built with bazel
     # https://github.com/abseil/abseil-cpp/blob/ee0ebda/FAQ.md#what-is-abi-and-why-dont-you-recommend-using-a-pre-compiled-version-of-abseil
     # - abseil-cpp
+
+#    - pip
+#    - python
+#    - wheel
+#    - setuptools
+#    - setuptools-scm
+#    - numpy
+#    # we use openssl instead of boringssl
+#    - openssl
+#    - bzip2
+#    - blosc
+#    - libcurl
+#    - libjpeg-turbo
+#    - libpng
+#    - libwebp
+#    - lz4
+#    - xz
+#    - zlib
+#    - libprotobuf
+#    # unvendored
+#    - pybind11
+#    - pybind11-abi
+#    # Use the one from https://github.com/google/tensorstore/blob/master/third_party/com_github_nlohmann_json/workspace.bzl
+#    - nlohmann_json 3.10.5
+#    - libavif
+#    # needs to be built with bazel
+#    # https://github.com/abseil/abseil-cpp/blob/ee0ebda/FAQ.md#what-is-abi-and-why-dont-you-recommend-using-a-pre-compiled-version-of-abseil
+#    # - abseil-cpp
   run:
-    - ml_dtypes
+    - ml_dtypes >=0.5.0
+    - numpy >=1.22.0
     - python
 
 test:
