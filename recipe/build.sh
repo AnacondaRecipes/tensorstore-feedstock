@@ -2,17 +2,7 @@
 
 set -euxo pipefail
 
-if [[ $target_platform == "linux-ppc64le" ]]; then
-export CFLAGS=$(echo $CFLAGS | sed -e 's/-mtune=power8//g' | sed -e 's/-mcpu=power8//g' )
-export CXXFLAGS=$(echo $CXXFLAGS | sed -e 's/-mtune=power8//g' | sed -e 's/-mcpu=power8//g' )
-export DEBUG_CFLAGS=$(echo $DEBUG_CFLAGS | sed -e 's/-mtune=power8//g' | sed -e 's/-mcpu=power8//g' )
-export DEBUG_CXXFLAGS=$(echo $DEBUG_CXXFLAGS | sed -e 's/-mtune=power8//g' | sed -e 's/-mcpu=power8//g' )
-fi
-
 source gen-bazel-toolchain
-if [[ $target_platform =~ osx.* && -d "$CONDA_BUILD_SYSROOT/usr/include/curl" ]]; then
-    mv "$CONDA_BUILD_SYSROOT/usr/include/curl" "$CONDA_BUILD_SYSROOT/usr/include/curl.do-not-use"
-fi
 
 system_libs="com_google_boringssl"
 system_libs+=",org_sourceware_bzip2"
@@ -39,6 +29,11 @@ build_options+=" --local_cpu_resources=${CPU_COUNT}"
 build_options+=" --cpu=${TARGET_CPU}"
 build_options+=" --subcommands"  # comment out for debugging
 export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
+
+# Disble bazel sandbox build, because it goes with toolchain error
+# src/main/tools/process-wrapper-legacy.cc:80: 
+# "execvp(bazel_toolchain/crosstool_wrapper_driver_is_not_gcc, ...)": No such file or directory
+build_options+=" --spawn_strategy=standalone"
 
 # TODO: figure out why we need both TENSORSTORE_BAZEL_BUILD_OPTIONS and a bazelrc
 cat > .bazelrc <<EOF

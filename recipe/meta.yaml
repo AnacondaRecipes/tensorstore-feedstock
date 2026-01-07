@@ -14,12 +14,12 @@ source:
   patches:
     # MacOS needs an extra linker flag so pybind11 finds the python symbols in _tensorstore.so :shrug:
     - patches/pybind11-linkopts.patch  # [osx]
-    - patches/0001-Explicitly-select-blake3-for-arm64.patch  # [target_platform == "osx-arm64" or target_platform == "linux-aarch64"]
-    - patches/0002-Explicitly-select-blake3-for-ppc64.patch  # [target_platform == "linux-ppc64le"]
+    - patches/0001-Explicitly-select-blake3-for-arm64.patch  # [osx or linux-aarch64]
+    - patches/0002-jpeg-require-image-boolean.patch
 
 build:
   skip: true  # [win]
-  number: 5
+  number: 7
 
 requirements:
   build:
@@ -30,12 +30,13 @@ requirements:
     - bazel
     - bazel {{ bazel_version }}
     - bazel-toolchain
-    - python                              # [target_platform != build_platform]
-    - cross-python_{{ target_platform }}  # [target_platform != build_platform]
-    - numpy                               # [target_platform != build_platform]
-    - pybind11                            # [target_platform != build_platform]
-    - pybind11-abi                        # [target_platform != build_platform]
-    - zlib                                # [target_platform != build_platform]
+    # https://github.com/conda-forge/bazel-toolchain-feedstock/pull/22
+    - bazel-toolchain <0.3                # [osx]
+    - python
+    - numpy
+    - pybind11
+    - pybind11-abi
+    - zlib
   host:
     - pip
     - python
@@ -48,11 +49,12 @@ requirements:
     - bzip2
     - blosc
     - libcurl
-    - libjpeg-turbo
+    # - libjpeg-turbo
+    - jpeg
     - libpng
     - libwebp
     - lz4
-    - xz
+    # - liblzma-devel
     - zlib
     - libprotobuf
     # unvendored
@@ -78,7 +80,7 @@ test:
     - pip
 
 about:
-  home: https://pypi.org/project/tensorstore/
+  home: https://pypi.org/project/tensorstore
   summary: Read and write large, multi-dimensional arrays
   license: Apache-2.0 AND MIT AND BSD-3-Clause AND BSD-2-Clause
   license_file:
