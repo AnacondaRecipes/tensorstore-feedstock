@@ -12,7 +12,7 @@ system_libs+=",jpeg"
 system_libs+=",png"
 system_libs+=",libwebp"
 system_libs+=",org_lz4"
-system_libs+=",org_tukaani_xz"
+# system_libs+=",org_tukaani_xz"
 system_libs+=",net_zlib"
 system_libs+=",com_github_pybind_pybind11"
 system_libs+=",com_github_nlohmann_json"
@@ -28,6 +28,8 @@ build_options+=" --toolchain_resolution_debug"
 build_options+=" --local_cpu_resources=${CPU_COUNT}"
 build_options+=" --cpu=${TARGET_CPU}"
 build_options+=" --subcommands"  # comment out for debugging
+build_options+=" --cxxopt=-Wno-missing-template-arg-list-after-template-kw"
+build_options+=" --cxxopt=-Wno-error=missing-template-arg-list-after-template-kw"
 export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
 
 # Disble bazel sandbox build, because it goes with toolchain error
