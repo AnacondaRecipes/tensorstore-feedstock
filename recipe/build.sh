@@ -1,9 +1,8 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 set -euxo pipefail
-
+echo "DEBUG___________________build.sh___start"
 source gen-bazel-toolchain
-
+echo "DEBUG___________________"
 system_libs="com_google_boringssl"
 system_libs+=",org_sourceware_bzip2"
 system_libs+=",org_blosc_cblosc"
@@ -30,12 +29,11 @@ build_options+=" --cpu=${TARGET_CPU}"
 build_options+=" --subcommands"  # comment out for debugging
 build_options+=" --cxxopt=-Wno-missing-template-arg-list-after-template-kw"
 build_options+=" --cxxopt=-Wno-error=missing-template-arg-list-after-template-kw"
-export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
-
 # Disble bazel sandbox build, because it goes with toolchain error
 # src/main/tools/process-wrapper-legacy.cc:80: 
 # "execvp(bazel_toolchain/crosstool_wrapper_driver_is_not_gcc, ...)": No such file or directory
 build_options+=" --spawn_strategy=standalone"
+export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
 
 # TODO: figure out why we need both TENSORSTORE_BAZEL_BUILD_OPTIONS and a bazelrc
 cat > .bazelrc <<EOF
