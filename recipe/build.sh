@@ -42,10 +42,28 @@ build --logging=6
 build --verbose_failures
 build --local_cpu_resources=${CPU_COUNT}
 EOF
-echo "DEBUG___________________3"
+
 # replace bundled baselisk with a simpler forwarder to our own bazel in build prefix
 export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
 export TENSORSTORE_BAZELISK="${RECIPE_DIR}/bazelisk_shim.py"
+echo "DEBUG___________________3"
+
+echo "PYTHON=${PYTHON}"
+"${PYTHON}" -V
+"${PYTHON}" -c "import sys; print(sys.executable); print(sys.prefix)"
+
+echo "BUILD_PREFIX=${BUILD_PREFIX}"
+echo "RECIPE_DIR=${RECIPE_DIR}"
+
+echo "BAZEL_EXE=${BAZEL_EXE}"
+ls -l "${BAZEL_EXE}" || true
+"${BAZEL_EXE}" --version || true
+
+echo "TENSORSTORE_BAZELISK=${TENSORSTORE_BAZELISK}"
+ls -l "${TENSORSTORE_BAZELISK}" || true
+head -n 5 "${TENSORSTORE_BAZELISK}" || true
+
+"${PYTHON}" "${TENSORSTORE_BAZELISK}" --help >/dev/null 2>&1 || true
 
 ${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
 echo "DEBUG___________________4"
