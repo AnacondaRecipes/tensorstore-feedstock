@@ -3,6 +3,7 @@ set -euxo pipefail
 
 source gen-bazel-toolchain
 
+# we use openssl instead of boringssl
 system_libs="com_google_boringssl"
 system_libs+=",org_sourceware_bzip2"
 system_libs+=",org_blosc_cblosc"
