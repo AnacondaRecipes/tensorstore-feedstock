@@ -32,7 +32,7 @@ requirements:
     - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
     # Keep bazel listed twice here to help the migrators track dependencies
-    - bazel
+    # - bazel
     - bazel {{ bazel_version }}
     - bazel-toolchain
     # https://github.com/conda-forge/bazel-toolchain-feedstock/pull/22
