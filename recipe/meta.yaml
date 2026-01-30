@@ -18,7 +18,7 @@ source:
     - patches/0002-jpeg-require-image-boolean.patch
 
 build:
-  skip: true  # [win or linux]
+  skip: true  # [py<39 or win or linux]
   number: 6
   ignore_run_exports:
     - libprotobuf
@@ -31,49 +31,41 @@ requirements:
     - {{ compiler('c') }}
     - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
-    # Keep bazel listed twice here to help the migrators track dependencies
-    # - bazel
     - bazel {{ bazel_version }}
     - bazel-toolchain
     # https://github.com/conda-forge/bazel-toolchain-feedstock/pull/22
     - bazel-toolchain <0.3                # [osx]
     - python
-    - numpy
+    - numpy {{ numpy }}
     - pybind11
     - pybind11-abi
-    - zlib
+    - zlib {{ zlib }}
   host:
     - pip
     - python
     - wheel
-    - setuptools
-    - setuptools-scm
-    - numpy
+    - setuptools >=30.3.0
+    - setuptools-scm >=8.1.0
+    - numpy {{ numpy }}
     # we use openssl instead of boringssl
-    - openssl
-    - bzip2
-    - blosc
-    - libcurl
-    # - libjpeg-turbo
-    - jpeg
-    - libpng
-    - libwebp
-    - lz4
-    # - liblzma-devel
-    - zlib
-    - libprotobuf
-    # unvendored
+    - openssl {{ openssl }}
+    - bzip2 {{ bzip2 }}
+    - blosc {{ blosc }}
+    - libcurl {{ libcurl }}
+    - jpeg {{ jpeg }}
+    - libpng {{ libpng }}
+    - libwebp {{ libwebp }}
+    - zlib {{ zlib }}
+    - libprotobuf {{ libprotobuf }}
+    - libavif {{ libavif }}
     - pybind11
     - pybind11-abi
+    - lz4
     # Use the one from https://github.com/google/tensorstore/blob/master/third_party/com_github_nlohmann_json/workspace.bzl
-    - nlohmann_json 3.10.5
-    - libavif
-    # needs to be built with bazel
-    # https://github.com/abseil/abseil-cpp/blob/ee0ebda/FAQ.md#what-is-abi-and-why-dont-you-recommend-using-a-pre-compiled-version-of-abseil
-    # - abseil-cpp
+    - nlohmann_json
   run:
-    - ml_dtypes
-    - python
+    - ml_dtypes >=0.3.1
+    - python >=3.9
 
 test:
   imports:
@@ -86,7 +78,6 @@ test:
 
 about:
   home: https://pypi.org/project/tensorstore
-  summary: Read and write large, multi-dimensional arrays
   license: Apache-2.0 AND MIT AND BSD-3-Clause AND BSD-2-Clause
   license_file:
     - LICENSE
@@ -94,8 +85,12 @@ about:
     - licenses/com_google_re2.txt
     - licenses/com_google_riegeli.txt
     - licenses/net_sourceforge_half.txt
+  summary: Read and write large, multi-dimensional arrays
+  description: |
+    TensorStore is an open-source C++ and Python software library designed for 
+    storage and manipulation of large multi-dimensional arrays
   dev_url: https://github.com/google/tensorstore
-  doc_url: https://github.com/google/tensorstore
+  doc_url: https://google.github.io/tensorstore/
 
 extra:
   recipe-maintainers:
