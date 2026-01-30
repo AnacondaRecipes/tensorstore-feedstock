@@ -49,7 +49,7 @@ EOF
 export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
 export TENSORSTORE_BAZELISK="${RECIPE_DIR}/bazelisk_shim.py"
 
-${PYTHON} -m pip install . -vv
+${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
 
 # Save vendored licenses
 mkdir -p licenses

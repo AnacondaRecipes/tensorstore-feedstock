@@ -18,7 +18,7 @@ source:
     - patches/0002-jpeg-require-image-boolean.patch
 
 build:
-  skip: true  # [win]
+  skip: true  # [win or linux]
   number: 6
   ignore_run_exports:
     - libprotobuf
@@ -95,6 +95,7 @@ about:
     - licenses/com_google_riegeli.txt
     - licenses/net_sourceforge_half.txt
   dev_url: https://github.com/google/tensorstore
+  doc_url: https://github.com/google/tensorstore
 
 extra:
   recipe-maintainers:
