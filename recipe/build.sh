@@ -44,22 +44,24 @@ build --local_cpu_resources=${CPU_COUNT}
 EOF
 
 # replace bundled baselisk with a simpler forwarder to our own bazel in build prefix
-# export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
-# export TENSORSTORE_BAZELISK="${RECIPE_DIR}/bazelisk_shim.py"
-
-# Make an executable "bazelisk" wrapper that runs our python shim with the right interpreter
-cat > "${SRC_DIR}/bazelisk_shim" <<EOF
-#!/usr/bin/env bash
-exec "${PYTHON}" "${RECIPE_DIR}/bazelisk_shim.py" "\$@"
-EOF
-chmod +x "${SRC_DIR}/bazelisk_shim"
-
 export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
-export TENSORSTORE_BAZELISK="${SRC_DIR}/bazelisk_shim"
-
+export TENSORSTORE_BAZELISK="${RECIPE_DIR}/bazelisk_shim.py"
+unset TENSORSTORE_BAZELISK
 echo "DEBUG___________________3"
 
-${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
+# ${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
+
+set +e
+${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv 2>&1 | tee "${SRC_DIR}/pip-build.log"
+rc=${PIPESTATUS[0]}
+set -e
+if [[ $rc -ne 0 ]]; then
+  echo "==== LAST 200 LINES OF pip-build.log ===="
+  tail -n 200 "${SRC_DIR}/pip-build.log"
+  exit $rc
+fi
+
+
 echo "DEBUG___________________4"
 # Save vendored licenses
 mkdir -p licenses
