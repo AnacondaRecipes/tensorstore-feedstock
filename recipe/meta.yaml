@@ -35,11 +35,8 @@ requirements:
     - bazel-toolchain
     # https://github.com/conda-forge/bazel-toolchain-feedstock/pull/22
     - bazel-toolchain <0.3                # [osx]
-    - python
-    - numpy {{ numpy }}
-    - pybind11
-    - pybind11-abi
-    - zlib {{ zlib }}
+    # - pybind11
+    # - pybind11-abi
   host:
     - pip
     - python
@@ -68,13 +65,19 @@ requirements:
     - python >=3.9
 
 test:
+  source_files:
+    - python/tensorstore/tests
   imports:
     - tensorstore
-  commands:
-    - pip list
-    - pip check
   requires:
     - pip
+    - pytest
+    - ml_dtypes
+    - cloudpickle
+    - numpy {{ numpy }}
+  commands:
+    - pip check
+    - pytest -ra -v --tb=short python/tensorstore/tests
 
 about:
   home: https://pypi.org/project/tensorstore
