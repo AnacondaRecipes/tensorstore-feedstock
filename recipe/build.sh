@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euxo pipefail
-echo "DEBUG___________________build.sh___start"
+
 source gen-bazel-toolchain
 
 system_libs="com_google_boringssl"
@@ -18,7 +18,7 @@ system_libs+=",com_github_nlohmann_json"
 system_libs+=",org_aomedia_avif"
 # system_libs+=",com_google_absl"
 export TENSORSTORE_SYSTEM_LIBS="$system_libs"
-echo "DEBUG___________________1"
+
 build_options=""
 build_options+=" --crosstool_top=//bazel_toolchain:toolchain"
 build_options+=" --logging=6"
@@ -34,7 +34,7 @@ build_options+=" --cxxopt=-Wno-error=missing-template-arg-list-after-template-kw
 # "execvp(bazel_toolchain/crosstool_wrapper_driver_is_not_gcc, ...)": No such file or directory
 build_options+=" --spawn_strategy=standalone"
 export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
-echo "DEBUG___________________2"
+
 # TODO: figure out why we need both TENSORSTORE_BAZEL_BUILD_OPTIONS and a bazelrc
 cat > .bazelrc <<EOF
 build --crosstool_top=//custom_toolchain:toolchain
@@ -46,23 +46,9 @@ EOF
 # replace bundled baselisk with a simpler forwarder to our own bazel in build prefix
 export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
 export TENSORSTORE_BAZELISK="${RECIPE_DIR}/bazelisk_shim.py"
-unset TENSORSTORE_BAZELISK
-echo "DEBUG___________________3"
 
-# ${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
+${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
 
-set +e
-${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv 2>&1 | tee "${SRC_DIR}/pip-build.log"
-rc=${PIPESTATUS[0]}
-set -e
-if [[ $rc -ne 0 ]]; then
-  echo "==== LAST 200 LINES OF pip-build.log ===="
-  tail -n 200 "${SRC_DIR}/pip-build.log"
-  exit $rc
-fi
-
-
-echo "DEBUG___________________4"
 # Save vendored licenses
 mkdir -p licenses
 ls bazel-work/external/
