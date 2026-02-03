@@ -18,7 +18,7 @@ source:
     - patches/0002-jpeg-require-image-boolean.patch
 
 build:
-  skip: true  # [py<39 or win or linux]
+  skip: true  # [py<39 or win]
   number: 0
   ignore_run_exports:
     - libprotobuf

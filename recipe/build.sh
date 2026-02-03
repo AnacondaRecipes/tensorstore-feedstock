@@ -26,8 +26,12 @@ build_options+=" --toolchain_resolution_debug"
 build_options+=" --local_cpu_resources=${CPU_COUNT}"
 build_options+=" --cpu=${TARGET_CPU}"
 build_options+=" --subcommands"  # comment out for debugging
-build_options+=" --cxxopt=-Wno-missing-template-arg-list-after-template-kw"
-build_options+=" --cxxopt=-Wno-error=missing-template-arg-list-after-template-kw"
+
+if [[ "$target_platform" == osx-* ]] ; then
+    build_options+=" --cxxopt=-Wno-missing-template-arg-list-after-template-kw"
+    build_options+=" --cxxopt=-Wno-error=missing-template-arg-list-after-template-kw" 
+fi
+
 # Disble bazel sandbox build, because it goes with toolchain error
 # src/main/tools/process-wrapper-legacy.cc:80: 
 # "execvp(bazel_toolchain/crosstool_wrapper_driver_is_not_gcc, ...)": No such file or directory
@@ -36,9 +40,10 @@ export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
 
 # TODO: figure out why we need both TENSORSTORE_BAZEL_BUILD_OPTIONS and a bazelrc
 cat > .bazelrc <<EOF
-build --crosstool_top=//custom_toolchain:toolchain
+build --crosstool_top=//bazel_toolchain:toolchain
 build --logging=6
 build --verbose_failures
+build --spawn_strategy=standalone
 build --local_cpu_resources=${CPU_COUNT}
 EOF
 
