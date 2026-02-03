@@ -14,7 +14,6 @@ source:
   patches:
     # MacOS needs an extra linker flag so pybind11 finds the python symbols in _tensorstore.so :shrug:
     - patches/pybind11-linkopts.patch  # [osx]
-    # - patches/0001-Explicitly-select-blake3-for-arm64.patch  # [osx or linux-aarch64]
     - patches/0002-jpeg-require-image-boolean.patch
 
 build:
@@ -95,7 +94,7 @@ about:
     TensorStore is an open-source C++ and Python software library designed for 
     storage and manipulation of large multi-dimensional arrays
   dev_url: https://github.com/google/tensorstore
-  doc_url: https://google.github.io/tensorstore/
+  doc_url: https://google.github.io/tensorstore
 
 extra:
   recipe-maintainers:
