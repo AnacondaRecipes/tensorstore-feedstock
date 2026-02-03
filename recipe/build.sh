@@ -1,19 +1,9 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 set -euxo pipefail
 
-if [[ $target_platform == "linux-ppc64le" ]]; then
-export CFLAGS=$(echo $CFLAGS | sed -e 's/-mtune=power8//g' | sed -e 's/-mcpu=power8//g' )
-export CXXFLAGS=$(echo $CXXFLAGS | sed -e 's/-mtune=power8//g' | sed -e 's/-mcpu=power8//g' )
-export DEBUG_CFLAGS=$(echo $DEBUG_CFLAGS | sed -e 's/-mtune=power8//g' | sed -e 's/-mcpu=power8//g' )
-export DEBUG_CXXFLAGS=$(echo $DEBUG_CXXFLAGS | sed -e 's/-mtune=power8//g' | sed -e 's/-mcpu=power8//g' )
-fi
-
 source gen-bazel-toolchain
-if [[ $target_platform =~ osx.* && -d "$CONDA_BUILD_SYSROOT/usr/include/curl" ]]; then
-    mv "$CONDA_BUILD_SYSROOT/usr/include/curl" "$CONDA_BUILD_SYSROOT/usr/include/curl.do-not-use"
-fi
 
+# we use openssl instead of boringssl
 system_libs="com_google_boringssl"
 system_libs+=",org_sourceware_bzip2"
 system_libs+=",org_blosc_cblosc"
@@ -22,12 +12,10 @@ system_libs+=",jpeg"
 system_libs+=",png"
 system_libs+=",libwebp"
 system_libs+=",org_lz4"
-system_libs+=",org_tukaani_xz"
 system_libs+=",net_zlib"
 system_libs+=",com_github_pybind_pybind11"
 system_libs+=",com_github_nlohmann_json"
 system_libs+=",org_aomedia_avif"
-# system_libs+=",com_google_absl"
 export TENSORSTORE_SYSTEM_LIBS="$system_libs"
 
 build_options=""
@@ -38,13 +26,24 @@ build_options+=" --toolchain_resolution_debug"
 build_options+=" --local_cpu_resources=${CPU_COUNT}"
 build_options+=" --cpu=${TARGET_CPU}"
 build_options+=" --subcommands"  # comment out for debugging
+
+if [[ "$target_platform" == osx-* ]] ; then
+    build_options+=" --cxxopt=-Wno-missing-template-arg-list-after-template-kw"
+    build_options+=" --cxxopt=-Wno-error=missing-template-arg-list-after-template-kw" 
+fi
+
+# Disble bazel sandbox build, because it goes with toolchain error
+# src/main/tools/process-wrapper-legacy.cc:80: 
+# "execvp(bazel_toolchain/crosstool_wrapper_driver_is_not_gcc, ...)": No such file or directory
+build_options+=" --spawn_strategy=standalone"
 export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
 
 # TODO: figure out why we need both TENSORSTORE_BAZEL_BUILD_OPTIONS and a bazelrc
 cat > .bazelrc <<EOF
-build --crosstool_top=//custom_toolchain:toolchain
+build --crosstool_top=//bazel_toolchain:toolchain
 build --logging=6
 build --verbose_failures
+build --spawn_strategy=standalone
 build --local_cpu_resources=${CPU_COUNT}
 EOF
 
@@ -52,7 +51,7 @@ EOF
 export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
 export TENSORSTORE_BAZELISK="${RECIPE_DIR}/bazelisk_shim.py"
 
-${PYTHON} -m pip install . -vv
+${PYTHON} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
 
 # Save vendored licenses
 mkdir -p licenses
