@@ -112,7 +112,7 @@ EOF
 
 # Bazel not allow use absolute path: "absolute path inclusion(s) found"
 # -I/Applications/Xcode.app/.../usr/include
-# Fix: adding osx sdk to bazel sysroot
+# Fix: adding osx sdk as bazel sysroot
 if [[ "$target_platform" == osx-* ]] ; then
     SDKROOT="$(xcrun --show-sdk-path)"
     cat >> .bazelrc <<EOF
@@ -121,6 +121,11 @@ build --copt=-isysroot${SDKROOT}
 build --host_cxxopt=-isysroot${SDKROOT}
 build --host_copt=-isysroot${SDKROOT}
 EOF
+fi
+
+if [[ "$target_platform" == linux-aarch64 ]] ; then
+    echo "build --cxxopt=-mbranch-protection=none" >> .bazelrc
+    echo "build --host_cxxopt=-mbranch-protection=none" >> .bazelrc
 fi
 
 # replace bundled baselisk with a simpler forwarder to our own bazel in build prefix

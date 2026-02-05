@@ -3,8 +3,7 @@
 # Bazel version is specified upstream, file .bazelversion
 # https://github.com/google/tensorstore/blob/master/.bazelversion
 {% set bazel_version = "7.*" %}
-# tensorstore >=0.1.67,<=0.1.76 dep bazel 7.*
-# tensorstore >0.1.76 dep bazel 8.*
+# tensorstore >=0.1.77 need bazel 8.* (channel latest available 7.6.1)
 
 package:
   name: {{ name|lower }}
@@ -20,13 +19,14 @@ source:
     - patches/0003-system-libs-fix-include-unvendoring.patch
 
 build:
-  skip: true  # [py<310 or win or linux]
+  skip: true  # [py<310 or win or osx]
   number: 0
   ignore_run_exports:
     - libprotobuf
     - pybind11-abi
     - libcxx
     - numpy
+  no_linkage_analysis: True
 
 requirements:
   build:
