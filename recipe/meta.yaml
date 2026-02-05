@@ -1,8 +1,8 @@
 {% set name = "tensorstore" %}
-{% set version = "0.1.65" %}
+{% set version = "0.1.72" %}
 # Bazel version is specified upstream, file .bazelversion
 # https://github.com/google/tensorstore/blob/master/.bazelversion
-{% set bazel_version = "6.*" %}
+{% set bazel_version = "7.*" %}
 
 package:
   name: {{ name|lower }}
@@ -10,14 +10,15 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/tensorstore-{{ version }}.tar.gz
-  sha256: 65cbe5a600c32569bb0b9f597ea318cc298a13b42d5fc98168c97bb11f320eae
+  sha256: 763d7f6898711783f199c8226a9c0b259546f5c6d9b4dc0ad3c9e39627060022
   patches:
     # MacOS needs an extra linker flag so pybind11 finds the python symbols in _tensorstore.so :shrug:
-    - patches/pybind11-linkopts.patch  # [osx]
+    - patches/0001-pybind11-linkopts.patch  # [osx]
     - patches/0002-jpeg-require-image-boolean.patch
+    - patches/0003-system-libs-fix-include-unvendoring.patch
 
 build:
-  skip: true  # [py<39 or win]
+  skip: true  # [py<310 or win]
   number: 0
   ignore_run_exports:
     - libprotobuf
@@ -38,7 +39,7 @@ requirements:
     - pip
     - python
     - wheel
-    - setuptools >=30.3.0
+    - setuptools >=64
     - setuptools-scm >=8.1.0
     - numpy {{ numpy }}
     # we use openssl instead of boringssl
@@ -47,10 +48,10 @@ requirements:
     - blosc {{ blosc }}
     - libcurl {{ libcurl }}
     - jpeg {{ jpeg }}
+    - libtiff {{ libtiff }}
     - libpng {{ libpng }}
     - libwebp {{ libwebp }}
     - zlib {{ zlib }}
-    - libprotobuf {{ libprotobuf }}
     - libavif {{ libavif }}
     # py::dtype::num() add support in pybind11 >=2.10.0
     - pybind11 >=2.10.0,<3
@@ -59,7 +60,8 @@ requirements:
     - nlohmann_json
   run:
     - ml_dtypes >=0.3.1
-    - python >=3.9
+    - python >=3.10
+    - numpy >=1.22.0
 
 test:
   source_files:
