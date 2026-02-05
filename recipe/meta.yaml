@@ -18,7 +18,7 @@ source:
     - patches/0003-system-libs-fix-include-unvendoring.patch
 
 build:
-  skip: true  # [py<310 or win or linux]
+  skip: true  # [py<310 or win]
   number: 0
   ignore_run_exports:
     - libprotobuf

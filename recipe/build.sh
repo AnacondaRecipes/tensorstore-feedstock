@@ -62,7 +62,7 @@ build_options+=" --verbose_failures"
 build_options+=" --toolchain_resolution_debug"
 build_options+=" --local_cpu_resources=${CPU_COUNT}"
 build_options+=" --cpu=${TARGET_CPU}"
-build_options+=" --subcommands"  # comment out for debugging
+# build_options+=" --subcommands"  # comment out for debugging
 
 if [[ "$target_platform" == osx-* ]] ; then
     build_options+=" --cxxopt=-Wno-missing-template-arg-list-after-template-kw"
@@ -87,8 +87,6 @@ fi
 build_options+=" --spawn_strategy=standalone"
 export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
 
-SDKROOT=$(xcrun --show-sdk-path)
-
 cat > .bazelrc <<EOF
 build --crosstool_top=//bazel_toolchain:toolchain
 build --logging=6
@@ -97,11 +95,6 @@ build --spawn_strategy=standalone
 build --local_cpu_resources=${CPU_COUNT}
 build --cxxopt=-std=c++17
 build --host_cxxopt=-std=c++17
-
-build --cxxopt=-isysroot${SDKROOT}
-build --copt=-isysroot${SDKROOT}
-build --host_cxxopt=-isysroot${SDKROOT}
-build --host_copt=-isysroot${SDKROOT}
 
 # allow repo rules to see PREFIX (твои symlink'и include/lib)
 build --repo_env=PREFIX=${PREFIX}
@@ -116,6 +109,19 @@ build --linkopt=-Wl,-rpath,${PREFIX}/lib
 build --host_linkopt=-L${PREFIX}/lib
 build --host_linkopt=-Wl,-rpath,${PREFIX}/lib
 EOF
+
+# Bazel not allow use absolute path: "absolute path inclusion(s) found"
+# -I/Applications/Xcode.app/.../usr/include
+# Fix: adding osx sdk to bazel sysroot
+if [[ "$target_platform" == osx-* ]] ; then
+    export SDKROOT="$(xcrun --show-sdk-path)"
+    cat <<'EOF' >> .bazelrc
+build --cxxopt=-isysroot${SDKROOT}
+build --copt=-isysroot${SDKROOT}
+build --host_cxxopt=-isysroot${SDKROOT}
+build --host_copt=-isysroot${SDKROOT}
+EOF
+fi
 
 # replace bundled baselisk with a simpler forwarder to our own bazel in build prefix
 export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
