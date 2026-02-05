@@ -114,8 +114,8 @@ EOF
 # -I/Applications/Xcode.app/.../usr/include
 # Fix: adding osx sdk to bazel sysroot
 if [[ "$target_platform" == osx-* ]] ; then
-    export SDKROOT="$(xcrun --show-sdk-path)"
-    cat <<'EOF' >> .bazelrc
+    SDKROOT="$(xcrun --show-sdk-path)"
+    cat >> .bazelrc <<EOF
 build --cxxopt=-isysroot${SDKROOT}
 build --copt=-isysroot${SDKROOT}
 build --host_cxxopt=-isysroot${SDKROOT}
