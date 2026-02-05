@@ -87,6 +87,8 @@ fi
 build_options+=" --spawn_strategy=standalone"
 export TENSORSTORE_BAZEL_BUILD_OPTIONS="$build_options"
 
+SDKROOT=$(xcrun --show-sdk-path)
+
 cat > .bazelrc <<EOF
 build --crosstool_top=//bazel_toolchain:toolchain
 build --logging=6
@@ -95,6 +97,11 @@ build --spawn_strategy=standalone
 build --local_cpu_resources=${CPU_COUNT}
 build --cxxopt=-std=c++17
 build --host_cxxopt=-std=c++17
+
+build --cxxopt=-isysroot${SDKROOT}
+build --copt=-isysroot${SDKROOT}
+build --host_cxxopt=-isysroot${SDKROOT}
+build --host_copt=-isysroot${SDKROOT}
 
 # allow repo rules to see PREFIX (твои symlink'и include/lib)
 build --repo_env=PREFIX=${PREFIX}
