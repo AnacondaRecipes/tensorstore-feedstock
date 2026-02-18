@@ -123,11 +123,6 @@ build --host_copt=-isysroot${SDKROOT}
 EOF
 fi
 
-if [[ "$target_platform" == linux-aarch64 ]] ; then
-    echo "build --cxxopt=-mbranch-protection=none" >> .bazelrc
-    echo "build --host_cxxopt=-mbranch-protection=none" >> .bazelrc
-fi
-
 # replace bundled baselisk with a simpler forwarder to our own bazel in build prefix
 export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
 export TENSORSTORE_BAZELISK="${RECIPE_DIR}/bazelisk_shim.py"
