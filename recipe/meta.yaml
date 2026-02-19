@@ -26,6 +26,11 @@ build:
     - pybind11-abi
     - libcxx
     - numpy
+  # conda-build check binaries on linux-aarch64 failed due to ELF_DYNAMIC_TAGS is not supported TAG,
+  # which is not supported by lief (tested with lief 0.16.4 and 0.16.6).
+  # This is a workaround to ignore the overlinking error.
+  # Issue reproduced on conda-build 26.1.0 (latest)
+  # Fix in development is here: https://github.com/conda/conda-build/pull/5778
   overlinking_ignore_patterns:  # [linux and aarch64]
     - "**/site-packages/tensorstore/_tensorstore.cpython-*-aarch64-linux-gnu.so"  # [linux and aarch64]
 
