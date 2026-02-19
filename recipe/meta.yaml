@@ -26,6 +26,8 @@ build:
     - pybind11-abi
     - libcxx
     - numpy
+  overlinking_ignore_patterns:  # [linux and aarch64]
+    - "**/site-packages/tensorstore/_tensorstore.cpython-*-aarch64-linux-gnu.so"  # [linux and aarch64]
 
 requirements:
   build:
