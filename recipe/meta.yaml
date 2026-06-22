@@ -14,7 +14,7 @@ source:
   patches:
     # MacOS needs an extra linker flag so pybind11 finds the python symbols in _tensorstore.so :shrug:
     - patches/pybind11-linkopts.patch  # [osx]
-    - patches/0001-Explicitly-select-blake3-for-arm64.patch
+    - patches/0001-Explicitly-select-blake3-for-arm64.patch # [osx or (linux and aarch64)]
     - patches/0003-use-system-libs.patch
     - patches/0004-use-system-numpy.patch
     - patches/0005-aws-c-common-avx2.patch
