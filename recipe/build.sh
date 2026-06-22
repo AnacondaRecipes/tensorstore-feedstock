@@ -87,7 +87,22 @@ build --define=with_cross_compiler_support=true
 build --local_cpu_resources=${CPU_COUNT}
 build --cpu=${TARGET_CPU}
 EOF
-
+if [[ "$target_platform" == osx-* ]] ; then
+    build_options+=" --cxxopt=-Wno-missing-template-arg-list-after-template-kw"
+    build_options+=" --cxxopt=-Wno-error=missing-template-arg-list-after-template-kw"
+    # Disable clang modules (target + host)
+    build_options+=" --features=-modules"
+    build_options+=" --features=-module_maps"
+    build_options+=" --features=-use_header_modules"
+    build_options+=" --host_features=-modules"
+    build_options+=" --host_features=-module_maps"
+    build_options+=" --host_features=-use_header_modules"
+    # Extra hard-disable in case toolchain still tries modules
+    build_options+=" --copt=-fno-modules"
+    build_options+=" --cxxopt=-fno-modules"
+    build_options+=" --host_copt=-fno-modules"
+    build_options+=" --host_cxxopt=-fno-modules"
+fi
 # replace bundled baselisk with a simpler forwarder to our own bazel in build prefix
 export BAZEL_EXE="${BUILD_PREFIX}/bin/bazel"
 export TENSORSTORE_BAZELISK="${RECIPE_DIR}/bazelisk_shim.py"
