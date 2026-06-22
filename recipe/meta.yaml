@@ -1,9 +1,8 @@
 {% set name = "tensorstore" %}
-{% set version = "0.1.72" %}
+{% set version = "0.1.84" %}
 # Bazel version is specified upstream, file .bazelversion
 # https://github.com/google/tensorstore/blob/master/.bazelversion
-{% set bazel_version = "7.*" %}
-# tensorstore >=0.1.77 need bazel 8.* (channel latest available 7.6.1)
+{% set bazel_version = "8.*" %}
 
 package:
   name: {{ name|lower }}
@@ -11,15 +10,20 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/tensorstore-{{ version }}.tar.gz
-  sha256: 763d7f6898711783f199c8226a9c0b259546f5c6d9b4dc0ad3c9e39627060022
+  sha256: 3cb091dfde68600e6d8f03a389ccc92ffa7c0798a0c600d1013c0138d7163e6b
   patches:
     # MacOS needs an extra linker flag so pybind11 finds the python symbols in _tensorstore.so :shrug:
-    - patches/0001-pybind11-linkopts.patch  # [osx]
-    - patches/0002-jpeg-require-image-boolean.patch
-    - patches/0003-system-libs-fix-include-unvendoring.patch
+    - patches/pybind11-linkopts.patch  # [osx]
+    - patches/0001-Explicitly-select-blake3-for-arm64.patch # [osx or (linux and aarch64)]
+    - patches/0003-use-system-libs.patch
+    - patches/0004-use-system-numpy.patch
+    - patches/0005-aws-c-common-avx2.patch
+    - patches/0007-aws-c-common-cpuid-fallback.patch
+    - patches/0008-protobuf-upb-no-werror.patch         # [osx]
+    - patches/0009-c-ares-darwin-no-msg_nosignal.patch  # [osx]
 
 build:
-  skip: true  # [py<310 or win]
+  skip: true  # [py<311 or win]
   number: 0
   ignore_run_exports:
     - libprotobuf
@@ -55,7 +59,7 @@ requirements:
     - bzip2 {{ bzip2 }}
     - blosc {{ blosc }}
     - libcurl {{ libcurl }}
-    - jpeg {{ jpeg }}
+    - libjpeg-turbo {{ libjpeg_turbo }}
     - libtiff {{ libtiff }}
     - libpng {{ libpng }}
     - libwebp {{ libwebp }}
