@@ -21,7 +21,7 @@ source:
     - patches/0007-aws-c-common-cpuid-fallback.patch
     - patches/0008-protobuf-upb-no-werror.patch         # [osx]
     - patches/0009-c-ares-darwin-no-msg_nosignal.patch  # [osx]
-    - patches/0010-python315-weakrefs.patch # [py315]
+    - patches/0010-python315-weakrefs.patch # [py>=315]
 
 build:
   skip: true  # [py<311 or win]
